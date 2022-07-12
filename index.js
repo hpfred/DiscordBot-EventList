@@ -1,24 +1,29 @@
 const Discord = require("discord.js")
 require("dotenv").config()
 
-//const TOKEN = "abdcd"
-
 const client = new Discord.Client({
     intents: [
         "GUILDS",
-        "GUILD_MESSAGES"
+        "GUILD_MESSAGES",
+        "GUILD_MEMBERS"
     ]
 })
 
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}`)
-})
+let bot = {
+    client,
+    prefix: "|",
+    owners: ["176113547225464832"]
+}
 
-client.on("messageCreate", (message) => {
-    if (message.content == "Teste"){
-        message.reply("Memes")
-    }
-})
+client.commands = new Discord.Collection()
+client.events = new Discord.Collection()
 
-//client.login(TOKEN)
+client.loadEvents = (bot, reload) => require("./handlers/events")(bot, reload)
+client.loadCommands = (bot, reload) => require("./handlers/commands")(bot, reload)
+
+client.loadEvents(bot, false)
+client.loadCommands(bot, false)
+
+module.exports = bot
+
 client.login(process.env.TOKEN)
