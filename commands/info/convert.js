@@ -4,6 +4,8 @@ module.exports = {
     permissions: [],
     devOnly: false,
     run: async ({client, message, args}) => {
+        //let  [c1, c2, c3, c4, ...rest] = input.split (" ");
+        //let msg = rest.join (" ");
         var elements = message.content.split(" ", 5)
         //elments [0] = prefix
         //elments [1] = date
@@ -19,35 +21,30 @@ module.exports = {
         //time [0] = hour
         //time [1] = minute
 
-        //function seconds_since_epoch(d){ 
-        //    return Math.floor( d / 1000 ); 
-        //}
-        //var d = new Date(date[2],date[1],date[0],time[0],time[1],0,0)   //(year, month, day, hours, minutes, seconds, milliseconds)
-        //Hora tá dando errado pq date pega o horário do PC que tá rodando (Brasilia) e não UTC
-        //var epoch = seconds_since_epoch(d)
-        //var epoch = Math.floor(d/1000)
-        var d = Date(Date.UTC(date[2],date[1]-1,date[0],time[0],time[1]))
+        var title = message.content.slice(message.content.indexOf("\"")+1,-1)
+
+        var d = new Date(date[2],date[1]-1,date[0],time[0],time[1])   //(year, month, day, hours, minutes)
         var epoch = Math.floor(d/1000)
 
-        //message.reply(d+" - <t:"+d+">")
-
+        var timezoneOffset = d.getTimezoneOffset()
         if(elements[3]=="PT" || elements[3]=="PDT" || elements[3]=="PST"){
-            timezone = -8
+            timezone = (-8 * 3600) + (timezoneOffset*60)
+            //O problema que tá dando é que tu quer converter do GMT-8 pra GMT e não o contrário, então tem que somar 8 na verdade
         }
         else if(elements[3]=="ET" || elements[3]=="EDT" || elements[3]=="EST"){
-            timezone = -5
+            timezone = (-5 * 3600) + (timezoneOffset*60)
         }
         else if(elements[3]=="BRT"){
-            timezone = -3
+            timezone = (-3 * 3600) + (timezoneOffset*60)
         }
         else{
-            elements = 0 //Aqui fazer com a pessoa passando como "GMT+X" ou "GMT-Y"
+            timezone = 0    //Aqui fazer com a pessoa passando como "GMT+X" ou "GMT-Y"
         }
 
-        utc_time = epoch + (timezone*60*60)
+        utc_time = epoch - (timezone)
         utc_endtime = utc_time + (elements[4]*60)
 
-        message.reply("**"+elements[5]+"** (<t:"+utc_time+":d> | <t:"+utc_time+":t> - <t:"+utc_endtime+":t>\nStarts: <t:"+utc_time+":R>")
-        message.reply("``**"+elements[5]+"** (<t:"+utc_time+":d> | <t:"+utc_time+":t> - <t:"+utc_endtime+":t>\nStarts: <t:"+utc_time+":R>``")
+        message.reply("**"+title+"** (<t:"+utc_time+":d> | <t:"+utc_time+":t> - <t:"+utc_endtime+":t>)\nStarts: <t:"+utc_time+":R>")
+        message.reply("``**"+title+"** (<t:"+utc_time+":d> | <t:"+utc_time+":t> - <t:"+utc_endtime+":t>)\nStarts: <t:"+utc_time+":R>``")
     }
 }
