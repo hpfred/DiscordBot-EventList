@@ -25,23 +25,32 @@ module.exports = {
 
         var d = new Date(date[2],date[1]-1,date[0],time[0],time[1])   //(year, month, day, hours, minutes)
         var epoch = Math.floor(d/1000)
+        
+        var tzs = require('timezone-abbr-offsets')
+        //timezoneOffset = tzs[elements[3]]
+        //timezoneOffset = tzs["PST"]
+        timezoneOffset = eval("tzs."+elements[3])
+        //timezoneOffset = eval("tzs.PST")
+        //console.log(`Teste de input ${elements[3]} deu ${timezoneOffset}`)
 
-        var timezoneOffset = d.getTimezoneOffset()
-        if(elements[3]=="PT" || elements[3]=="PDT" || elements[3]=="PST"){
-            timezone = (-8 * 3600) + (timezoneOffset*60)
-            //O problema que tá dando é que tu quer converter do GMT-8 pra GMT e não o contrário, então tem que somar 8 na verdade
+        var currentTimezoneOffset = d.getTimezoneOffset()
+        timezone = (timezoneOffset + currentTimezoneOffset)*60
+        if(elements[3]=="PT"){
+            //timezone = (tzs.PST + currentTimezoneOffset)*60
+            timezone = (tzs.PDT + currentTimezoneOffset)*60
         }
-        else if(elements[3]=="ET" || elements[3]=="EDT" || elements[3]=="EST"){
-            timezone = (-5 * 3600) + (timezoneOffset*60)
+        else if(elements[3]=="ET"){
+            //timezone = (tzs.EST + currentTimezoneOffset)*60
+            timezone = (tzs.EDT + currentTimezoneOffset)*60
         }
-        else if(elements[3]=="BRT"){
-            timezone = (-3 * 3600) + (timezoneOffset*60)
-        }
-        else{
-            timezone = 0    //Aqui fazer com a pessoa passando como "GMT+X" ou "GMT-Y"
-        }
+        // else if(elements[3]=="BRT"){
+        //     timezone = (-3 * 3600) + (currentTimezoneOffset*60)
+        // }
+        // else{
+        //     timezone = 0    //Aqui fazer com a pessoa passando como "GMT+X" ou "GMT-Y"
+        // }
 
-        utc_time = epoch - (timezone)
+        utc_time = epoch - timezone
         utc_endtime = utc_time + (elements[4]*60)
 
         message.reply("**"+title+"** (<t:"+utc_time+":d> | <t:"+utc_time+":t> - <t:"+utc_endtime+":t>)\nStarts: <t:"+utc_time+":R>")

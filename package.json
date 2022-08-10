@@ -18,6 +18,7 @@
   "homepage": "https://github.com/hpfred/DiscordBot-EventList#readme",
   "dependencies": {
     "discord.js": "^13.8.1",
-    "dotenv": "^16.0.1"
+    "dotenv": "^16.0.1",
+    "timezone-abbr-offsets": "^1.0.2"
   }
 }
